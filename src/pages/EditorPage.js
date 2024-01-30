@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-
 import Client from "../components/Client";
 import { initSocket } from "../socket";
 import {
   useLocation,
   useNavigate,
-  Navigate,
   useParams,
 } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -18,6 +16,8 @@ function EditorPage() {
   const { roomId } = useParams();
 
   const [clientsList, setClientsList] = useState([]);
+  const [isAsidePopupVisible, setAsidePopupVisible] = useState(false);
+
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -35,7 +35,6 @@ function EditorPage() {
         username: location.state?.username,
       });
 
-      //Listening for joined event
       socketRef.current.on("joined", ({ clients, username, socketId }) => {
         if (username !== location.state?.username) {
           toast.success(`${username} joined the room`);
@@ -45,7 +44,6 @@ function EditorPage() {
         socketRef.current.emit("sync-text", {});
       });
 
-      // Listening for disconnected
       socketRef.current.on("disconnected", ({ socketId, username }) => {
         if (username !== undefined) {
           toast.success(`${username} left the room`);
@@ -78,23 +76,27 @@ function EditorPage() {
 
   const leaveRoom = () => {
     reactNavigator("/");
-    toast.success("Disconneced");
+    toast.success("Disconnected");
   };
 
-  // if (!location.state) {
-  //   return <Naviagte to="/" />;
-  // }
+  const toggleAsidePopup = () => {
+    setAsidePopupVisible(!isAsidePopupVisible);
+  };
 
   return (
     <>
       <div className="mainWrap">
-       
-
         <div className="editorWrap">
           <Editor />
         </div>
         <div className="aside">
-          <div className="asideInner">
+        <button className="btn showAsidePopup" onClick={toggleAsidePopup}>
+            CONTRIBUTER
+          </button>
+       
+          {isAsidePopupVisible && (
+            <div className="asidePopup">
+                 <div className="asideInner">
             <h4>Connected :</h4>
             <div className="clientsList">
               {clientsList.map((client) => (
@@ -108,6 +110,11 @@ function EditorPage() {
           <button className="btn leaveBtn" onClick={leaveRoom}>
             LEAVE
           </button>
+         
+            
+              <button className="btn leaveBtn" onClick={toggleAsidePopup}>Close</button>
+            </div>
+          )}
         </div>
       </div>
     </>
