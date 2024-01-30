@@ -112,7 +112,7 @@ function EditorPage() {
           </button>
          
             
-              <button className="btn leaveBtn" onClick={toggleAsidePopup}>Close</button>
+              <button  className="btn copyBtn" onClick={toggleAsidePopup}>Close</button>
             </div>
           )}
         </div>
